@@ -57,8 +57,31 @@ void Chip8CPU::opCall()
 
 void Chip8CPU::opEqual()
 {
-	int x = (opcode >> 8) & 0x0F;
-	int n = opcode & 0xFF;
+	int x = (opcode >> 8) & 0xF;
+	char n = opcode & 0xFF;
 	if(V[x] == n) pc+=4;
 	else pc+=2;
+}
+
+void Chip8CPU::opNEqual()
+{
+	int x = (opcode >> 8) & 0xF;
+	char n = opcode & 0xFF;
+	if(V[x] != n) pc+=4;
+	else pc+=2;
+}
+
+void Chip8CPU::opVEqual()
+{
+	int x = (opcode >> 8) & 0xF;
+	int y = (opcode >> 4) & 0xF;
+	if(V[x] == V[y]) pc+=4;
+	else pc+=2;
+}
+
+void Chip8CPU::opSetV()
+{
+	int x = (opcode >> 8) & 0xF;
+	char n = opcode & 0xFF;
+	V[x] = n;
 }
