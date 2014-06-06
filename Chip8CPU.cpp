@@ -119,5 +119,5 @@ void Chip8CPU::opRand()
 {
 	int x = (opcode >> 8) & 0xF;
 	int n = opcode & 0xFF;
-	V[x] = rand() & 0xFF;
+	V[x] = rand() & n;
 }

@@ -42,7 +42,7 @@ private:
 	void opSetV(); //opcode 6XNN - set V[x] to NN
 	void opAdd(); //opcode 7XNN - add NN to V[x]
 
-	void opVNEqual();//opcode 9xy0 - skip if V[x] not equal V[y]
+	void opVNEqual(); //opcode 9xy0 - skip if V[x] not equal V[y]
 	void opSetI(); //opcode ANNN - set I to NNN
 	void opJumpOff(); //opcode BNNN - jumps to NNN + V[0]
 	void opRand(); //opcode CxNN - sets V[x] to random integer & NN
