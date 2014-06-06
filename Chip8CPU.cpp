@@ -7,6 +7,7 @@
 
 #include "Chip8CPU.h"
 #include <iostream>
+#include <cstdlib>
 
 using namespace std;
 
@@ -22,6 +23,7 @@ Chip8CPU::Chip8CPU() {
 	delay_timer = 0;
 	sound_timer = 0;
 	drawFlag = true;
+	srand(time(NULL));
 }
 
 Chip8CPU::~Chip8CPU() {
@@ -84,4 +86,38 @@ void Chip8CPU::opSetV()
 	int x = (opcode >> 8) & 0xF;
 	char n = opcode & 0xFF;
 	V[x] = n;
+}
+
+void Chip8CPU::opAdd()
+{
+	int x = (opcode >> 8) & 0xF;
+	char n = opcode & 0xFF;
+	V[x] += n;
+}
+
+void Chip8CPU::opVNEqual()
+{
+	int x = (opcode >> 8) & 0xF;
+	int y = (opcode >> 4) & 0xF;
+	if(V[x] != V[y]) pc+=4;
+	else pc+=2;
+}
+
+void Chip8CPU::opSetI()
+{
+	int n = opcode & 0xFFF;
+	I = n;
+}
+
+void Chip8CPU::opJumpOff()
+{
+	int n = opcode & 0xFFF;
+	pc = n + V[0];
+}
+
+void Chip8CPU::opRand()
+{
+	int x = (opcode >> 8) & 0xF;
+	int n = opcode & 0xFF;
+	V[x] = rand() & 0xFF;
 }
