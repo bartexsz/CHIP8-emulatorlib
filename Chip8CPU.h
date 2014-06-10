@@ -14,6 +14,7 @@ private:
 	char memory[4096];
 	char V[16];
 	short stack[16];
+	bool key[16];
 	short I;
 	short sp;
 	short pc;
@@ -29,7 +30,7 @@ private:
 			&Chip8CPU::opEqual, &Chip8CPU::opNEqual, &Chip8CPU::opVEqual,
 			&Chip8CPU::opSetV, &Chip8CPU::opAdd, &Chip8CPU::opMath,
 			&Chip8CPU::opVNEqual, &Chip8CPU::opSetI, &Chip8CPU::opJumpOff,
-			&Chip8CPU::opRand, &Chip8CPU::opNULL, &Chip8CPU::opNULL,
+			&Chip8CPU::opRand, &Chip8CPU::opNULL, &Chip8CPU::opKey,
 			&Chip8CPU::opNULL
 	};
 	void (Chip8CPU::*opSpecial0Table[16])() =
@@ -48,6 +49,15 @@ private:
 			&Chip8CPU::opVShiftR, &Chip8CPU::opVYSub, &Chip8CPU::opNULL,
 			&Chip8CPU::opNULL, &Chip8CPU::opNULL, &Chip8CPU::opNULL,
 			&Chip8CPU::opNULL, &Chip8CPU::opNULL, &Chip8CPU::opVShiftL,
+			&Chip8CPU::opNULL
+	};
+	void (Chip8CPU::*opKeyTable[16])() =
+	{
+			&Chip8CPU::opNULL, &Chip8CPU::opKeyXNPressed, &Chip8CPU::opNULL,
+			&Chip8CPU::opNULL, &Chip8CPU::opNULL, &Chip8CPU::opNULL,
+			&Chip8CPU::opNULL, &Chip8CPU::opNULL, &Chip8CPU::opNULL,
+			&Chip8CPU::opNULL, &Chip8CPU::opNULL, &Chip8CPU::opNULL,
+			&Chip8CPU::opNULL, &Chip8CPU::opNULL, &Chip8CPU::opKeyXPressed,
 			&Chip8CPU::opNULL
 	};
 
@@ -80,6 +90,10 @@ private:
 	void opSetI(); //opcode ANNN - set I to NNN
 	void opJumpOff(); //opcode BNNN - jumps to NNN + V[0]
 	void opRand(); //opcode CxNN - sets V[x] to random integer & NN
+
+	void opKey(); // key opcodes starting with E
+	void opKeyXPressed(); // opcode EX9E - skips if key in v[x] is pressed
+	void opKeyXNPressed(); // opcode EXA1 - skips if key in v[x] is not pressed
 
 public:
 	Chip8CPU();

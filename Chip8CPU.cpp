@@ -38,6 +38,7 @@ void Chip8CPU::execute()
 {
 	fetch();
 	(this->*opcodeTable[(opcode & 0xF000) >> 12])();
+	pc+=2;
 }
 
 void Chip8CPU::opNULL()
@@ -59,11 +60,13 @@ void Chip8CPU::opReturn()
 {
 	sp--;
 	pc = stack[sp];
+	pc-=2;
 }
 
 void Chip8CPU::opJump()
 {
 	pc = (opcode & 0x0FFF);
+	pc-=2;
 }
 
 void Chip8CPU::opCall()
@@ -71,30 +74,28 @@ void Chip8CPU::opCall()
 	stack[sp] = pc;
 	sp++;
 	pc = (opcode & 0x0FFF);
+	pc-=2;
 }
 
 void Chip8CPU::opEqual()
 {
 	int x = (opcode >> 8) & 0xF;
 	char n = opcode & 0xFF;
-	if(V[x] == n) pc+=4;
-	else pc+=2;
+	if(V[x] == n) pc+=2;
 }
 
 void Chip8CPU::opNEqual()
 {
 	int x = (opcode >> 8) & 0xF;
 	char n = opcode & 0xFF;
-	if(V[x] != n) pc+=4;
-	else pc+=2;
+	if(V[x] != n) pc+=2;
 }
 
 void Chip8CPU::opVEqual()
 {
 	int x = (opcode >> 8) & 0xF;
 	int y = (opcode >> 4) & 0xF;
-	if(V[x] == V[y]) pc+=4;
-	else pc+=2;
+	if(V[x] == V[y]) pc+=2;
 }
 
 void Chip8CPU::opSetV()
@@ -219,3 +220,19 @@ void Chip8CPU::opRand()
 	V[x] = rand() & n;
 }
 
+void Chip8CPU::opKey()
+{
+	(this->*opKeyTable[opcode & 0x000F])();
+}
+
+void Chip8CPU::opKeyXPressed()
+{
+	int x = (opcode >> 8) & 0xF;
+	if(key[V[x]] == true) pc+=2;
+}
+
+void Chip8CPU::opKeyXNPressed()
+{
+	int x = (opcode >> 8) & 0xF;
+	if(key[V[x]] == false) pc+=2;
+}
