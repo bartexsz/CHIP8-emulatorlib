@@ -45,6 +45,22 @@ void Chip8CPU::opNULL()
 	cerr << "Unimplemented opcode: " << hex << opcode << "\n";
 }
 
+void Chip8CPU::opSpec0()
+{
+	(this->*opSpecial0Table[(opcode & 0x00F0) >> 4])();
+}
+
+void Chip8CPU::opClear()
+{
+	for(int i = 0; i < 64*32; i++) gfx[i] = 0;
+}
+
+void Chip8CPU::opReturn()
+{
+	sp--;
+	pc = stack[sp];
+}
+
 void Chip8CPU::opJump()
 {
 	pc = (opcode & 0x0FFF);
@@ -95,6 +111,87 @@ void Chip8CPU::opAdd()
 	V[x] += n;
 }
 
+void Chip8CPU::opMath()
+{
+	(this->*opMathTable[(opcode & 0x00F0) >> 4])();
+}
+
+void Chip8CPU::opSetVV()
+{
+	int x = (opcode >> 8) & 0xF;
+	int y = (opcode >> 4) & 0xF;
+	V[x] = V[y];
+}
+
+void Chip8CPU::opOR()
+{
+	int x = (opcode >> 8) & 0xF;
+	int y = (opcode >> 4) & 0xF;
+	V[x] = V[x] | V[y];
+}
+
+void Chip8CPU::opAND()
+{
+	int x = (opcode >> 8) & 0xF;
+	int y = (opcode >> 4) & 0xF;
+	V[x] = V[x] & V[y];
+}
+
+void Chip8CPU::opXOR()
+{
+	int x = (opcode >> 8) & 0xF;
+	int y = (opcode >> 4) & 0xF;
+	V[x] = V[x] ^ V[y];
+}
+
+void Chip8CPU::opVAdd()
+{
+	int x = (opcode >> 8) & 0xF;
+	int y = (opcode >> 4) & 0xF;
+	if(V[x] + V[y] > 0xFF)
+	{
+		V[0xF] = 1;
+		V[x] = V[y] + V[x] - 0xFF;
+	}
+	else
+	{
+		V[0xF] = 0;
+		V[x] = V[y] + V[x];
+	}
+}
+
+void Chip8CPU::opVSub()
+{
+	int x = (opcode >> 8) & 0xF;
+	int y = (opcode >> 4) & 0xF;
+	if(V[x] > V[y]) V[0xF] = 0;
+	else V[0xF] = 1;
+	V[x] = V[x] - V[y];
+}
+
+void Chip8CPU::opVShiftR()
+{
+	int x = (opcode >> 8) & 0xF;
+	V[0xF] = V[x] & 0b1;
+	V[x] = V[x] >> 1;
+}
+
+void Chip8CPU::opVYSub()
+{
+	int x = (opcode >> 8) & 0xF;
+	int y = (opcode >> 4) & 0xF;
+	if(V[y] > V[y]) V[0xF] = 0;
+	else V[0xF] = 1;
+	V[x] = V[y] - V[x];
+}
+
+void Chip8CPU::opVShiftL()
+{
+	int x = (opcode >> 8) & 0xF;
+	V[0xF] = V[x] >> 7;
+	V[x] = V[x] << 1;
+}
+
 void Chip8CPU::opVNEqual()
 {
 	int x = (opcode >> 8) & 0xF;
@@ -121,3 +218,4 @@ void Chip8CPU::opRand()
 	int n = opcode & 0xFF;
 	V[x] = rand() & n;
 }
+
