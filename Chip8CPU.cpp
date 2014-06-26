@@ -236,3 +236,108 @@ void Chip8CPU::opKeyXNPressed()
 	int x = (opcode >> 8) & 0xF;
 	if(key[V[x]] == false) pc+=2;
 }
+
+void Chip8CPU::opSpecialF()
+{
+	switch(opcode & 0xFF)
+	{
+	case 0x07:
+		opSetVDelay();
+		break;
+	case 0x0A:
+		opKeyPressWait();
+		break;
+	case 0x15:
+		opSetDelayV();
+		break;
+	case 0x18:
+		opSetSoundV();
+		break;
+	case 0x1E:
+		opIAddV();
+		break;
+	case 0x29:
+		opSetISpriteV();
+		break;
+	case 0x33:
+		opStoreIBCDV();
+		break;
+	case 0x55:
+		opStoreIV();
+		break;
+	case 0x65:
+		opStoreVI();
+		break;
+	}
+}
+
+void Chip8CPU::opSetVDelay()
+{
+	int x = (opcode >> 8) & 0xF;
+	V[x] = delay_timer;
+}
+
+void Chip8CPU::opKeyPressWait()
+{
+	int x = (opcode >> 8) & 0xF;
+	for(int i = 0; i < 0xF; i++)
+	{
+		if(key[i])
+		{
+			V[x] = i;
+			return;
+		}
+	}
+	pc-=2;
+}
+
+void Chip8CPU::opSetDelayV()
+{
+	int x = (opcode >> 8) & 0xF;
+	delay_timer = V[x];
+}
+
+void Chip8CPU::opSetSoundV()
+{
+	int x = (opcode >> 8) & 0xF;
+	sound_timer = V[x];
+}
+
+void Chip8CPU::opIAddV()
+{
+	int x = (opcode >> 8) & 0xF;
+	if(I+V[x] > 0xFFF) V[0xF] = 1;
+	I += V[x];
+}
+
+void Chip8CPU::opSetISpriteV()
+{
+	int x = (opcode >> 8) & 0xF;
+	I = V[x] * 5; //Sprites are coded binary, with 4x5 size, starting at 0x0
+}
+
+void Chip8CPU::opStoreIBCDV()
+{
+	int x = (opcode >> 8) & 0xF;
+	memory[I] = V[x] / 100;
+	memory[I+1] = V[x] / 10 % 10;
+	memory[I+2] = V[x] % 10;
+}
+
+void Chip8CPU::opStoreIV()
+{
+	int x = (opcode >> 8) & 0xF;
+	for(int i = 0; i <= x; i++)
+	{
+		memory[I+i] = V[i];
+	}
+}
+
+void Chip8CPU::opStoreVI()
+{
+	int x = (opcode >> 8) & 0xF;
+	for(int i = 0; i <= x; i++)
+	{
+		V[i] = memory[I+i];
+	}
+}

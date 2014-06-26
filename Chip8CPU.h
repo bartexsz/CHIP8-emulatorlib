@@ -31,7 +31,7 @@ private:
 			&Chip8CPU::opSetV, &Chip8CPU::opAdd, &Chip8CPU::opMath,
 			&Chip8CPU::opVNEqual, &Chip8CPU::opSetI, &Chip8CPU::opJumpOff,
 			&Chip8CPU::opRand, &Chip8CPU::opNULL, &Chip8CPU::opKey,
-			&Chip8CPU::opNULL
+			&Chip8CPU::opSpecialF
 	};
 	void (Chip8CPU::*opSpecial0Table[16])() =
 	{
@@ -60,6 +60,7 @@ private:
 			&Chip8CPU::opNULL, &Chip8CPU::opNULL, &Chip8CPU::opKeyXPressed,
 			&Chip8CPU::opNULL
 	};
+
 
 	void opNULL(); //Unimplemented opcode
 
@@ -94,6 +95,17 @@ private:
 	void opKey(); // key opcodes starting with E
 	void opKeyXPressed(); // opcode EX9E - skips if key in v[x] is pressed
 	void opKeyXNPressed(); // opcode EXA1 - skips if key in v[x] is not pressed
+
+	void opSpecialF(); // special opcodes starting with F; Implemented with switch because of their structure
+	void opSetVDelay(); // opcode FX07 - sets V[x] to the value of the delay timer
+	void opKeyPressWait(); // opcode FX0A - waits for keypress and stores its value in V[x]
+	void opSetDelayV(); // opcode FX15 - sets delay timer to V[x]
+	void opSetSoundV(); // opcode FX18 - sets sound timer to V[x]
+	void opIAddV(); // opcode FX1E - adds V[x] to I. V[0xF] is set to 1 if there is overflow
+	void opSetISpriteV(); // opcode FX29 - sets I to address sprite V[x]
+	void opStoreIBCDV(); // opcode FX33 - stores BCD-coded value of V[x] at memory[I to I+2]
+	void opStoreIV(); // opcode FX55 - stores V[0 to X] in memory starting at address I
+	void opStoreVI(); // opcode FX65 - stores values in memory starting at address I in registers V[0 to x];
 
 public:
 	Chip8CPU();
