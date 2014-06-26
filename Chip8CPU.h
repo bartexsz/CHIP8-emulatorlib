@@ -60,7 +60,7 @@ private:
 			&Chip8CPU::opNULL, &Chip8CPU::opNULL, &Chip8CPU::opKeyXPressed,
 			&Chip8CPU::opNULL
 	};
-
+	void loadFont();
 
 	void opNULL(); //Unimplemented opcode
 
@@ -111,11 +111,14 @@ private:
 public:
 	Chip8CPU();
 	virtual ~Chip8CPU();
-	void update(char* keypad);
+	void pushButton(int btn);
+	void releaseButton(int btn);
+	void loadProgram(char* data, int size);
+	char* getMemSnapshot();
+	void loadMemSnapshot(char* data);
 	char* getGfx();
 	bool drawReady();
-	int getState();
-	void setState(int state);
+	bool isBeep();
 	void execute();
 };
 

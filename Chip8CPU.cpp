@@ -8,11 +8,11 @@
 #include "Chip8CPU.h"
 #include <iostream>
 #include <cstdlib>
+#include <cstring>
 
 using namespace std;
 
 Chip8CPU::Chip8CPU() {
-	state = 1;
 	for(int i =0; i < 64*32; i++) gfx[i] = 0;
 	for(int i = 0; i <16; i++) {stack[i] = 0; V[i]=0;}
 	for(int i = 0; i < 4096; i++) memory[i]=0;
@@ -34,11 +34,76 @@ void Chip8CPU::fetch()
 	opcode = ((memory[pc] << 8) + memory[pc+1]);
 }
 
+void Chip8CPU::loadFont()
+{
+	unsigned char chip8_fontset[80] =
+	{
+	  0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+	  0x20, 0x60, 0x20, 0x20, 0x70, // 1
+	  0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+	  0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+	  0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+	  0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+	  0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+	  0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+	  0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+	  0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+	  0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+	  0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+	  0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+	  0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+	  0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+	  0xF0, 0x80, 0xF0, 0x80, 0x80  // F
+	};
+
+	memcpy(memory, chip8_fontset, 80);
+}
+
 void Chip8CPU::execute()
 {
 	fetch();
 	(this->*opcodeTable[(opcode & 0xF000) >> 12])();
 	pc+=2;
+}
+
+bool Chip8CPU::drawReady()
+{
+	return drawFlag;
+}
+
+bool Chip8CPU::isBeep()
+{
+	return (sound_timer!=0);
+}
+
+void Chip8CPU::pushButton(int btn)
+{
+	key[btn] = 1;
+}
+
+void Chip8CPU::releaseButton(int btn)
+{
+	key[btn] = 0;
+}
+
+void Chip8CPU::loadProgram(char* data, int size)
+{
+	memcpy(memory+512, data, size);
+}
+
+void Chip8CPU::loadMemSnapshot(char* data)
+{
+	memcpy(memory, data, 4096);
+}
+
+char* Chip8CPU::getMemSnapshot()
+{
+	return memory;
+}
+
+char* Chip8CPU::getGfx()
+{
+	return gfx;
 }
 
 void Chip8CPU::opNULL()
