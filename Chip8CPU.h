@@ -30,7 +30,7 @@ private:
 			&Chip8CPU::opEqual, &Chip8CPU::opNEqual, &Chip8CPU::opVEqual,
 			&Chip8CPU::opSetV, &Chip8CPU::opAdd, &Chip8CPU::opMath,
 			&Chip8CPU::opVNEqual, &Chip8CPU::opSetI, &Chip8CPU::opJumpOff,
-			&Chip8CPU::opRand, &Chip8CPU::opNULL, &Chip8CPU::opKey,
+			&Chip8CPU::opRand, &Chip8CPU::opDraw, &Chip8CPU::opKey,
 			&Chip8CPU::opSpecialF
 	};
 	void (Chip8CPU::*opSpecial0Table[16])() =
@@ -91,6 +91,7 @@ private:
 	void opSetI(); //opcode ANNN - set I to NNN
 	void opJumpOff(); //opcode BNNN - jumps to NNN + V[0]
 	void opRand(); //opcode CxNN - sets V[x] to random integer & NN
+	void opDraw(); //opcode DXYN - draws sprite from address stored in I to screen at x, y
 
 	void opKey(); // key opcodes starting with E
 	void opKeyXPressed(); // opcode EX9E - skips if key in v[x] is pressed

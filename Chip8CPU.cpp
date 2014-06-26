@@ -220,6 +220,29 @@ void Chip8CPU::opRand()
 	V[x] = rand() & n;
 }
 
+void Chip8CPU::opDraw()
+{
+	int x0 = (opcode >> 8) & 0xF;
+	int y0 = (opcode >> 4) & 0xF;
+	int h = opcode & 0xF;
+
+	V[0xF] = 0;
+
+	for (int y = 0; y < h; y++)
+	{
+		int sline = memory[I+y];
+		for(int x = 0; x < 8; x++)
+		{
+			if(sline & (0b10000000 >> x) !=0)
+			{
+				if(gfx[(y+y0)*64 + x + x0] != 0) V[0xF] = 1;
+				gfx[(y+y0)*64 + x + x0] ^= 1;
+			}
+		}
+	}
+	drawFlag = true;
+}
+
 void Chip8CPU::opKey()
 {
 	(this->*opKeyTable[opcode & 0x000F])();
